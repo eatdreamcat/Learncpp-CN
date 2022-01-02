@@ -96,7 +96,7 @@
 	            <a href="#s1">分类</a>
 	                    <ul class="submenu">
 	                        <li>
-	                        <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E6%B8%B2%E6%9F%93/">图形渲染</a>
+	                        <a class="category-link" href="../categories/%E5%9B%BE%E5%BD%A2%E6%B8%B2%E6%9F%93/">图形渲染</a>
 	                    </ul>
 	        </li>
 	        
@@ -136,13 +136,13 @@
 			<ul class="icons">
                     
                     <li>
-                        <a title="github" href="https://github.com/eatdreamcat" target="_blank" rel="noopener">
+                        <a title="github" href="../https:/github.com/eatdreamcat" target="_blank" rel="noopener">
                             <i class="icon fa fa-github"></i>
                         </a>
                     </li>
                     
                     <li>
-                        <a title="500px" href="http://500px.com" target="_blank" rel="noopener">
+                        <a title="500px" href="../http:/500px.com" target="_blank" rel="noopener">
                             <i class="icon fa fa-500px"></i>
                         </a>
                     </li>
@@ -151,12 +151,89 @@
 </nav>
 
         <div id="main" >
-            <div class ="post_page_title_img" style="height: 25rem;background-image: url(/images/pbr_thumbnail.png);background-position: center; background-repeat:no-repeat; background-size:cover;-moz-background-size:cover;overflow:hidden;" >
+            <div class ="post_page_title_img" style="height: 25rem;background-image: url(/2022/01/01/PBR/pbr_thumbnail.png);background-position: center; background-repeat:no-repeat; background-size:cover;-moz-background-size:cover;overflow:hidden;" >
                 <a href="#" style="padding: 4rem 4rem 2rem 4rem ;"><h2 >PBR</h2></a>
             </div>
             <!-- Post -->
             <div class="typo" style="padding: 3rem;">
-                
+                <h1 id="PBR-理论基础"><a href="#PBR-理论基础" class="headerlink" title="PBR 理论基础"></a><strong>PBR 理论基础</strong></h1><p>什么是 PBR？PBR 全称是 <strong>Physically Based Rendering</strong>, 但这里说的基于物理渲染，其实并不是严格按照物理上的准确的方式，而是一种<strong>近似</strong>。和基础光照模型一样，都是一种近似，只是 PBR 是一种更真实更符合物理特性上的近似。</p>
+<p><strong>图形学第一定律：只要看起来是对的，那就是对的。</strong><br>其实目前不管是哪一方向的理论研究，都是只在做一种近似逼近。</p>
+<p>PBR 通常包含 <strong>基础光学</strong>、 <strong>微平面理论</strong>、<strong>能量守恒</strong>、<strong>菲涅尔反射</strong>、 <strong>渲染方程</strong>；</p>
+<h3 id="基础光学"><a href="#基础光学" class="headerlink" title="基础光学"></a><strong>基础光学</strong></h3><p>光是什么？光是一种横向传播的电磁波。<br><img src="/2022/01/01/PBR/ray.png" alt="ray" title="光波"></p>
+<p>在微观世界里，光波在进入一个物体时，会和物理内的原子产生极化反应，一部分能量转换成热能，剩下的会被重新辐射出去。<br>在这一过程中，波与波之间还会存在各种干涉。如下图<br><img src="/2022/01/01/PBR/DiffuseFromMicrofacet.png" alt="ray" title="干涉"></p>
+<p>而在渲染领域，我们无需关心如此复杂的情况。<br>因此，需要对光先进行一些简化的定义：</p>
+<ul>
+<li>在均匀介质中光沿直线传播</li>
+<li>光是线性可加的</li>
+<li>光的传播满足能量守恒定律</li>
+<li>光和光传播不会碰撞和相交</li>
+</ul>
+<p>在此基础上，可以理想的认为，光在到达物体表面时，只会发生<strong>折射</strong>和<strong>反射</strong>。<br><img src="/2022/01/01/PBR/reflactFromPerfect.png" alt="ray" title="折射和反射"><br>折射进去的光线，一部分能量会转换成其他能量，一部分会从物体另一面穿透出去（例如一些透明物体），一部分会重新反射出表面（这部分可以理解为散射）。</p>
+<p>现实世界中，物质可以分为<strong>导体</strong>、<strong>半导体</strong>、<strong>绝缘体</strong>。因为导体（例如绝大部分金属）具有活跃的电子，因此光线在折射进去时，会很容易和电子产生反应而被吸收（因为光的电磁波属性），所以可以认为导体不存在散射（<strong>假定这个表面是个完美表面</strong>）。</p>
+<p>然而，在游戏世界中，很少会出现半导体这种物质。因此在游戏渲染中，通常只会把物体区分为<strong>金属（导体）</strong> 和 <strong>非金属（绝缘体）</strong>。</p>
+<p><em>那么我们该如何去描述光的折射和反射？</em></p>
+<p>本质上，我们所看到的世界，其实都是物体反射到眼睛里的光。<br>那么，我们可以简单的认为，<strong>最终的光照结果 = 物体表面漫反射 + 物体表面镜面反射</strong>。</p>
+<p>这里通过<strong>辐射度量</strong>来描述光的反射强度。</p>
+<ul>
+<li><p><strong>能量 Energy</strong></p>
+<p>单位焦耳，某个波长的光线能量实质上是含光子的数量。<br><img src="/2022/01/01/PBR/energy_formual.png" alt="ray" title="能量Energy"><br>h 为普朗克常数，λ 为波长。</p>
+</li>
+<li><p><strong>Flux</strong><br>Radiant flux,单位流明。实际上表达的是单位时间内的能量。<br><img src="/2022/01/01/PBR/flux.png" alt="ray" title="Flux"></p>
+</li>
+<li><p><strong>Irradiance</strong><br>表示给定一个有限的面积，在<strong>单位时间内单位面积</strong>所得到的能量。（对时间和面积的二重积分）<br><img src="/2022/01/01/PBR/irradiance.png" alt="ray" title="Irradiance"></p>
+<p>考虑空间中一个点光源，以它为球心，则在半径 r 处的球面上，单位时间单位面积的能量为<br><img src="/2022/01/01/PBR/sphere_radiance.png" alt="ray" title="sphere_radiance"></p>
+<p>这里可以看到，<strong>如果一个球面的半径越大，则单位时间内单位面积所得到的能量会越小</strong>。这就可以很好的解释能量的衰减。</p>
+</li>
+<li><p><strong>radiance</strong><br><em>In radiometry, radiance is the radiant flux emitted, reflected, transmitted or received by a given surface, per unit solid angle per unit projected area.(from wiki)</em><br>这里的大致意思是，radiance 指的是在单位投影面积，单位<strong>立体角</strong>下的能量。</p>
+</li>
+<li><p><strong>立体角</strong><br>常用字母 <strong>Ω</strong> 表示，是一个物体对特定点的三维空间的角度，是平面角在三维空间中的类比。<br>在二维平面中，一个圆弧的微分记为 <strong>ds</strong>，半径为 <strong>r</strong>，则圆心角表示为<br><img src="/2022/01/01/PBR/%E5%9C%86%E5%BF%83%E8%A7%92.png" alt="ray" title="圆心角"><br>其实就是<strong>弧度</strong>的概念。</p>
+<p>在三维空间中，<strong>立体角</strong>表示的<strong>ds</strong>则是球面上的面积微分，记为<strong>dA</strong>。分母则需要标成半径<strong>r 的平方</strong>。<br><img src="/2022/01/01/PBR/%E7%AB%8B%E4%BD%93%E8%A7%92%E5%BE%AE%E5%88%86.png" alt="ray" title="立体角微分"></p>
+<p>因为球的表面积为 $4πr^2$,所以积分到整球的话，立体角等于 4$\pi$。<br>从宏观角度看，立体角的计算公式为</p>
+<p><img src="/2022/01/01/PBR/%E5%AE%8F%E8%A7%82%E7%AB%8B%E4%BD%93%E8%A7%92.png" alt="ray" title="宏观立体角"></p>
+<p>A 被称为<strong>Spherical Cap</strong>，表示这个<strong>立体角</strong>所对应的<strong>球表面积</strong>。<strong>sr</strong>是球面度的单位。<br>如下图</p>
+<p><img src="/2022/01/01/PBR/%E7%90%83%E5%B8%BD.png" alt="ray" title="球帽"><br>当$\theta$（与 z 轴的夹角）等于 90° 时，则 A 变成半球表面积。（其实这里默认$\phi$的角度(沿水平向绕 z 轴旋转的角度)都是 2$\pi$）<br><strong>spherical cap 面积等于 2πrh</strong> ，当 h=r 时，正好就是半球表面积。</p>
+<p><strong>用球坐标来表示立体角</strong><br>在 <strong>单位球(r=1)</strong> 下，可以用两个 <strong>弧度变量 $\phi$ 和 $\theta$</strong> 来表示三维坐标系下的点 <strong>p(x,y,z)</strong> 。<br><img src="/2022/01/01/PBR/%E7%90%83%E5%9D%90%E6%A0%87.png" alt="ray" title="球坐标"><br><img src="/2022/01/01/PBR/%E7%90%83%E5%9D%90%E6%A0%87%E4%B8%8B%E7%9A%84%E7%AB%8B%E4%BD%93%E8%A7%92.png" alt="ray" title="球坐标下的立体角"></p>
+<p>因为 Ω = $\frac{A}{r^2}$, A = 2$\pi$rh, 对这个球面 A 做微分，可以理解为求一个极小矩形的面积。<br><img src="/2022/01/01/PBR/%E7%AB%8B%E4%BD%93%E8%A7%92%E5%BE%AE%E5%88%86%E7%90%83%E5%9D%90%E6%A0%87.png" alt="ray" title="立体角微分球坐标"><br>则 dA = 长 X 宽。<br>其中 宽 可以理解为在 z = r-h 的平面圆中，固定$\theta$下旋转 d$\phi$的弧长，即<br>宽 = r$\sin\theta$d$\phi$<br>同理 长 可以理解为 在 固定$\phi$下旋转 d$\theta$的弧长，即<br>长 = rd$\theta$<br>可以得出，立体角和 $\phi$ 、 $\theta$ 的关系式<br><img src="/2022/01/01/PBR/solid_angle.png" alt="ray" title="solid_angle"><br>以观测点为球心，构造一个单位球面；任意物体<strong>投影</strong>到该<strong>单位球面</strong>上的<strong>投影面积</strong>，即为<strong>该物体相对于该观测点</strong>的<strong>立体角</strong>。<br>因此，立体角是<strong>单位球面</strong>上的一块<strong>面积</strong>，这和“平面角是单位圆上的一段弧长”类似。</p>
+</li>
+</ul>
+<h3 id="渲染方程"><a href="#渲染方程" class="headerlink" title="渲染方程"></a><strong>渲染方程</strong></h3><p>在图形学领域中，渲染方程描述的是光能在场景中的流动，渲染方程是<strong>能量守恒</strong>的。<br>这个方程可以用下面的数学等式表示：<br><img src="/2022/01/01/PBR/%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B.png" alt="渲染方程" title="渲染方程"><br><img src="/2022/01/01/PBR/%E6%B8%B2%E6%9F%93%E6%96%B9%E7%A8%8B%E5%8F%82%E6%95%B0.png" alt="渲染方程参数" title="渲染方程参数"><br>(from wiki)<br>其中$f_{r}$即 BXDF,一般为<strong>BRDF（Bidirectional Reflectance Distribution Funtion）</strong></p>
+<h4 id="BRDF"><a href="#BRDF" class="headerlink" title="BRDF"></a>BRDF</h4><p>即双向反射<strong>分布</strong>函数，这里重点是<strong>分布</strong>。<br>通常，这里都是直接以迪士尼原则的 BRDF 为准，包含以下几个主要参数：<br><strong>baseColor（基础色）</strong>：表面颜色，通常由纹理贴图提供<br><strong>subsurface（次表面）</strong>：使用次表面近似控制漫反射形状<br><strong>metallic（金属度）</strong>：金属模型没有漫反射成分，并且还具有等于基础色的着色入射镜面反射<br><strong>specular（镜面反射强度）</strong>：入射镜面反射量。用来取代折射率<br><strong>specularTint（镜面反射颜色）</strong>：用于对基础色的入射镜面反射进行颜色控制<br><strong>roughness（粗糙度）</strong>：表面粗糙度，控制漫反射和镜面反射<br><strong>anisotropic（各向异性强度）</strong>：各向异性强度。用于控制镜面反射高光的纵横比。（0=各向同性，1=最大各向异性）<br><strong>sheen（光泽度）</strong>：一种额外的掠射分量，主要用于布料<br><strong>sheenTint（光泽颜色）</strong>：对光泽度的颜色控制<br><strong>clearcoat（清漆强度）</strong>：有特殊用途的第二镜面波瓣<br><strong>clearcoatGloss（清漆光泽度）</strong>：控制透明图层的光泽度，0=缎面， 1=光泽</p>
+<p>核心 BRDF 模型方面，Disney 采用了通用的 <strong>microfacet</strong> Cook-Torrance BRDF 着色模型：<br><img src="/2022/01/01/PBR/%E8%BF%AA%E5%A3%AB%E5%B0%BCBRDF.png" alt="核心BRDF模型" title="迪士尼BRDF"><br>其中 Diffuse 为漫反射项，公式模型如下：<br><img src="/2022/01/01/PBR/%E8%BF%AA%E5%A3%AB%E5%B0%BC%E6%BC%AB%E5%8F%8D%E5%B0%84%E5%85%AC%E5%BC%8F1.png" alt="迪士尼漫反射公式1" title="迪士尼漫反射公式1"><br>其中，<br><img src="/2022/01/01/PBR/%E8%BF%AA%E5%A3%AB%E5%B0%BC%E6%BC%AB%E5%8F%8D%E5%B0%84%E5%85%AC%E5%BC%8F2.png" alt="迪士尼漫反射公式2" title="迪士尼漫反射公式2"></p>
+<p><img src="/2022/01/01/PBR/%E8%BF%AA%E5%A3%AB%E5%B0%BC%E9%95%9C%E9%9D%A2%E5%8F%8D%E5%B0%84%E9%A1%B9.png" alt="迪士尼镜面反射项" title="迪士尼镜面反射项"><br>为镜面反射项，其中：<br><strong>D 函数</strong>为<strong>微平面</strong>的法向分布函数，主要用来描述在平面法向的分布形状<br><strong>F 函数</strong>为<strong>菲涅尔</strong>反射系数<br><strong>G 函数</strong>为阴影遮蔽函数，用来反映入射光在微表面中自成阴影的属性。<br>分母则是<strong>校正因子</strong>。</p>
+<p>为什么需要这几个函数？<br>这里就需要引入微平面理论</p>
+<h3 id="微平面理论"><a href="#微平面理论" class="headerlink" title="微平面理论"></a><strong>微平面理论</strong></h3><p>在传统的 Phong 或者 Blinn-Phong 光照模型中，我们在计算光照强度时，其实都默认平面是个完美平滑的表面，然而现实世界中，并非如此。<br><img src="/2022/01/01/PBR/Mircogeometry.png" alt="Mircogeometry" title="Mircogeometry"><br>在一个表面单元中，其实根据材质的不同，粗糙程度的不同，表现会有不同的凹凸分布的<strong>微表面</strong>。这就会导致一个表面单元中，会有多种法向分布方式。然而在实际渲染中，我们无须去计算每一个法向，而是用一种统计学的思想，去计算这个表面单元的法向分布形状，这就是上面所说的<strong>D 函数</strong>的作用。</p>
+<p>在这里，我们认为，对于每一块微表面只有<strong>n</strong> = <strong>m</strong> 时，反射光线才能被观察到，其中<strong>n</strong>为法向，<strong>m</strong>为半向量，即入射方向和观察方向的中间方向（相当于 Blinn-Phong 的 h）。</p>
+<p>常见的法向分布函数（NDF）模型有以下几种：</p>
+<ul>
+<li>Beckmann</li>
+<li>Blinn-Phong</li>
+<li>GGX</li>
+<li>GTR</li>
+<li>Anisotropic Beckmann</li>
+<li>Anisotropic GGX</li>
+</ul>
+<p>目前主流的分布函数是 GGX：<br><img src="/2022/01/01/PBR/GGX.png" alt="GGX" title="GGX"></p>
+<h3 id="菲涅尔反射"><a href="#菲涅尔反射" class="headerlink" title="菲涅尔反射"></a><strong>菲涅尔反射</strong></h3><p>当光从一种折射率为$n_{1}$,的介质向另一种折射率为$n_{2}$,的介质传播时，在两者的交界处（通常称作界面）可能会同时发生光的反射和折射。菲涅尔方程描述了光波的不同分量被折射和反射的情况，也描述了波反射时的相变。<br><img src="/2022/01/01/PBR/%E8%8F%B2%E6%B6%85%E5%B0%94%E5%8A%A8%E7%94%BB.gif" alt="菲涅尔动画" title="菲涅尔动画"><br>简单来说就是，在掠射角度下，会具有较强的反射现象，本质上可以用来描述反射强度，到这里，就会发现，反射强度受到多个维度变量的影响，而不是简单的$\cos{\theta}$了。<br><img src="/2022/01/01/PBR/%E8%8F%B2%E6%B6%85%E5%B0%94%E7%8E%B0%E8%B1%A1.jpg" alt="菲涅尔现象" title="菲涅尔现象"></p>
+<p>事实上，万物皆有菲涅尔现象，如下图<br><img src="/2022/01/01/PBR/%E8%8F%B2%E6%B6%85%E5%B0%94%E4%B9%A6%E6%9C%AC.png" alt="菲涅尔书本" title="菲涅尔书本"><br>菲涅尔方程成立的条件是：界面是<strong>光滑</strong>平面，入射光是<strong>平面波</strong>，<strong>边际效应</strong>可被忽略。<br><img src="/2022/01/01/PBR/%E8%8F%B2%E6%B6%85%E5%B0%94%E6%96%B9%E7%A8%8B%E5%8F%98%E9%87%8F.png" alt="菲涅尔方程变量" title="菲涅尔方程变量"><br>如上图，$\theta_{i}$ = $\theta_{r}$<br>且满足<strong>斯涅尔定律</strong>：<br>$n_{1}$$\sin$$\theta_{i}$ = $n_{2}$$\sin$$\theta_{t}$ ,其中$n_{1}$、$n_{2}$ 分别为两种介质的折射率，$\theta_{i}$ 、$\theta_{t}$ 分别为入射角和折射角。</p>
+<p>一定功率的入射光被界面反射的比例成为<strong>反射比 R</strong>；折射的比例成为<strong>透射比 T</strong>。<br><img src="/2022/01/01/PBR/%E5%8F%8D%E5%B0%84%E6%AF%94%E6%96%B9%E7%A8%8B.png" alt="反射比方程" title="反射比方程"><br>如果入射光的电矢量位于上图所在平面内（即 p 偏振），反射比为<br><img src="/2022/01/01/PBR/%E5%8F%8D%E5%B0%84%E6%AF%94p%E5%81%8F%E6%8C%AF.png" alt="反射比p偏振" title="反射比p偏振"><br>透射比无论在哪种情况下，都有$T= 1- R$。<br>如果入射光是无偏振的（含有等量的 s 偏振和 p 偏振），反射比是两者的算数平均值：</p>
+<p>$R=\frac{R_{S} + R_{p}}{2}$</p>
+<p>对于给定的折射率$n_{1}$,和$n_{2}$,且入射光为 p 偏振光时，当入射角为某一定值时$R_{p}$为零，此时 p 偏振光被完全透射而无反射光出射。这个角度被称作<strong>布儒斯特角</strong>，对于空气或真空中的玻璃介质约为 56°。注意这个定义只是对于两种折射率都为实数的介质才有意义，对于会吸光的物质，例如金属和半导体，折射率是一个复数，从而$R_{p}$一般不为零。</p>
+<p>当光从光密介质向光疏介质传播时（即$n_{1}$ &gt;$n_{2}$,时），存在一个临界的入射角，对于大于此入射角的入射光$R_{2}$=$R_{p}=1$,，此时入射光完全被界面反射。这种现象称作全内反射，临界角被称作全反射临界角，对于空气中的玻璃约为 41°。<br><img src="/2022/01/01/PBR/%E8%8F%B2%E6%B6%85%E5%B0%94%E8%BF%91%E4%BC%BC%E6%B3%95%E7%BA%BF.png" alt="菲涅尔近似法线" title="菲涅尔近似法线"><br><em>(from wiki)</em></p>
+<p>在渲染中，菲涅尔项通常选择 Schlick’s approximation：<br><img src="/2022/01/01/PBR/%E8%8F%B2%E6%B6%85%E5%B0%94SCHLICK.png" alt="菲涅尔SCHLICK" title="菲涅尔SCHLICK"><br>其中 $F_{0} = (\frac{n_{1}-n_{2}}{n_{1}+n_{2}})^2$</p>
+<h3 id="阴影遮蔽函数"><a href="#阴影遮蔽函数" class="headerlink" title="阴影遮蔽函数"></a><strong>阴影遮蔽函数</strong></h3><p><img src="/2022/01/01/PBR/%E9%98%B4%E5%BD%B1%E9%81%AE%E8%94%BD%E6%A8%A1%E5%9E%8B.png" alt="阴影遮蔽模型" title="阴影遮蔽模型"><br>Smith 联合阴影函数具有四种形式：</p>
+<ul>
+<li>分离遮蔽型阴影</li>
+<li>高度相关遮蔽阴影型</li>
+<li>方向相关遮蔽阴影型</li>
+<li>高度-方向相关遮蔽阴影型</li>
+</ul>
+<p>这里选择比较简单的<strong>分离遮蔽阴影型</strong>，该形式将<strong>G 函数</strong>氛围两个独立部分: 光线方向($l$), 视线方向($v$)<br>以 Schlick-GGX 为例，方程式为:<br><img src="/2022/01/01/PBR/GGX_SMITH.png" alt="GGX_SMITH" title="GGX_SMITH"></p>
+<h3 id="边缘光泽"><a href="#边缘光泽" class="headerlink" title="边缘光泽"></a><strong>边缘光泽</strong></h3><p>一些材质在掠射角度观察时，会显现出更亮的漫反射。<br>Disney BRDF 直接用缩放后的 Schlick 公式去模拟，即 $sheen$ 正比于$(1-\cos{\theta_{d}})^5$</p>
+<h3 id="清漆"><a href="#清漆" class="headerlink" title="清漆"></a><strong>清漆</strong></h3><p>像车漆或者木质材料中，通常有两层材料，最外层为透明材料。Disney BRDF 采用的方案是直接在漫反射项加上一个额外的高光，即<strong>clearcoat 项</strong>。</p>
+<p>其中清漆项同样采用 Cook-Torrance BRDF 着色模型，遮蔽项采用粗糙度定值为 0.25 的 GGX 函数，菲涅尔项用固定折射率为 1.5 的绝缘体，微表面法向分布函数取$\gamma=1$的各向同性 GTR 函数<br><img src="/2022/01/01/PBR/GTR.png" alt="GTR" title="GTR"></p>
+<h3 id="次表面散射"><a href="#次表面散射" class="headerlink" title="次表面散射"></a><strong>次表面散射</strong></h3><p>次表面散射是光在传播时的一种现象，表现为光在穿透透明物体表面后，与材料之间发生互相作用而导致光被散射开来，光路也在其他的位置穿出物体。<br><img src="/2022/01/01/PBR/diffuse_distance.png" alt="diffuse_distance" title="diffuse_distance"><br>如上图，蓝色散射光线和观察点具有一定距离，当这个距离在观察单元大小范围以内时，则为正常漫反射，当超出观察单元范围时，则表现为次表面散射。<br><img src="/2022/01/01/PBR/shader_pixel_diffuse.png" alt="shader_pixel_diffuse" title="shader_pixel_diffuse"></p>
+<p>Disney 在计算漫反射时，直接使用$mix(f_{d},f_{ss}, \sigma_{ss})$, 其中$f_{d}$为漫反射，$f_{ss}$为次表面散射，$\sigma_{ss}$为 subsurface</p>
+
             </div>
 
             <!-- Post Comments -->
