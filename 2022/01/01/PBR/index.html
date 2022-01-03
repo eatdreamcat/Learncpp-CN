@@ -213,6 +213,7 @@
 <li>Anisotropic GGX</li>
 </ul>
 <p>目前主流的分布函数是 GGX：<br><img src="/2022/01/01/PBR/GGX.png" alt="GGX" title="GGX"></p>
+<p>其中 $\alpha = roughness^2$</p>
 <h3 id="菲涅尔反射"><a href="#菲涅尔反射" class="headerlink" title="菲涅尔反射"></a><strong>菲涅尔反射</strong></h3><p>当光从一种折射率为$n_{1}$,的介质向另一种折射率为$n_{2}$,的介质传播时，在两者的交界处（通常称作界面）可能会同时发生光的反射和折射。菲涅尔方程描述了光波的不同分量被折射和反射的情况，也描述了波反射时的相变。<br><img src="/2022/01/01/PBR/%E8%8F%B2%E6%B6%85%E5%B0%94%E5%8A%A8%E7%94%BB.gif" alt="菲涅尔动画" title="菲涅尔动画"><br>简单来说就是，在掠射角度下，会具有较强的反射现象，本质上可以用来描述反射强度，到这里，就会发现，反射强度受到多个维度变量的影响，而不是简单的$\cos{\theta}$了。<br><img src="/2022/01/01/PBR/%E8%8F%B2%E6%B6%85%E5%B0%94%E7%8E%B0%E8%B1%A1.jpg" alt="菲涅尔现象" title="菲涅尔现象"></p>
 <p>事实上，万物皆有菲涅尔现象，如下图<br><img src="/2022/01/01/PBR/%E8%8F%B2%E6%B6%85%E5%B0%94%E4%B9%A6%E6%9C%AC.png" alt="菲涅尔书本" title="菲涅尔书本"><br>菲涅尔方程成立的条件是：界面是<strong>光滑</strong>平面，入射光是<strong>平面波</strong>，<strong>边际效应</strong>可被忽略。<br><img src="/2022/01/01/PBR/%E8%8F%B2%E6%B6%85%E5%B0%94%E6%96%B9%E7%A8%8B%E5%8F%98%E9%87%8F.png" alt="菲涅尔方程变量" title="菲涅尔方程变量"><br>如上图，$\theta_{i}$ = $\theta_{r}$<br>且满足<strong>斯涅尔定律</strong>：<br>$n_{1}$$\sin$$\theta_{i}$ = $n_{2}$$\sin$$\theta_{t}$ ,其中$n_{1}$、$n_{2}$ 分别为两种介质的折射率，$\theta_{i}$ 、$\theta_{t}$ 分别为入射角和折射角。</p>
 <p>一定功率的入射光被界面反射的比例成为<strong>反射比 R</strong>；折射的比例成为<strong>透射比 T</strong>。<br><img src="/2022/01/01/PBR/%E5%8F%8D%E5%B0%84%E6%AF%94%E6%96%B9%E7%A8%8B.png" alt="反射比方程" title="反射比方程"><br>如果入射光的电矢量位于上图所在平面内（即 p 偏振），反射比为<br><img src="/2022/01/01/PBR/%E5%8F%8D%E5%B0%84%E6%AF%94p%E5%81%8F%E6%8C%AF.png" alt="反射比p偏振" title="反射比p偏振"><br>透射比无论在哪种情况下，都有$T= 1- R$。<br>如果入射光是无偏振的（含有等量的 s 偏振和 p 偏振），反射比是两者的算数平均值：</p>
@@ -233,6 +234,274 @@
 <p>其中清漆项同样采用 Cook-Torrance BRDF 着色模型，遮蔽项采用粗糙度定值为 0.25 的 GGX 函数，菲涅尔项用固定折射率为 1.5 的绝缘体，微表面法向分布函数取$\gamma=1$的各向同性 GTR 函数<br><img src="/2022/01/01/PBR/GTR.png" alt="GTR" title="GTR"></p>
 <h3 id="次表面散射"><a href="#次表面散射" class="headerlink" title="次表面散射"></a><strong>次表面散射</strong></h3><p>次表面散射是光在传播时的一种现象，表现为光在穿透透明物体表面后，与材料之间发生互相作用而导致光被散射开来，光路也在其他的位置穿出物体。<br><img src="/2022/01/01/PBR/diffuse_distance.png" alt="diffuse_distance" title="diffuse_distance"><br>如上图，蓝色散射光线和观察点具有一定距离，当这个距离在观察单元大小范围以内时，则为正常漫反射，当超出观察单元范围时，则表现为次表面散射。<br><img src="/2022/01/01/PBR/shader_pixel_diffuse.png" alt="shader_pixel_diffuse" title="shader_pixel_diffuse"></p>
 <p>Disney 在计算漫反射时，直接使用$mix(f_{d},f_{ss}, \sigma_{ss})$, 其中$f_{d}$为漫反射，$f_{ss}$为次表面散射，$\sigma_{ss}$为 subsurface</p>
+<h1 id="PBR-Unity-实践"><a href="#PBR-Unity-实践" class="headerlink" title="PBR Unity 实践"></a><strong>PBR Unity 实践</strong></h1><pre class="line-numbers language-none"><code class="language-none">Shader &quot;CustomPBR&#x2F;CustomStandar&quot;
+&#123;
+    Properties
+    &#123;
+       &#x2F;&#x2F; 发射率贴图，体现模型的纹理和颜色，和baseColor相互作用
+        _MainTex (&quot;Albedo&quot;, 2D) &#x3D; &quot;white&quot; &#123;&#125;
+        _BaseColor (&quot;AlbedoColor&quot;, COLOR) &#x3D; (1,1,1,1)
+        &#x2F;&#x2F; 金属度贴图 灰白图，越白表示金属度越高
+        _MetallicTex(&quot;Metallic&quot;,2D) &#x3D; &quot;white&quot; &#123;&#125;
+
+        &#x2F;&#x2F; 遮挡贴图 模拟物体之间的阴影，在不打光的时候增加体积感
+        _OcclusionMap(&quot;Ambient Occlusion&quot;,2D) &#x3D; &quot;white&quot; &#123;&#125;
+        &#x2F;&#x2F; 法向贴图 法线贴图；用于增加模型的细节；
+        _BumpMap(&quot;NormalMap&quot;,2D) &#x3D; &quot;white&quot; &#123;&#125;
+        _BumpScale(&quot;BumpScale&quot;,FLOAT) &#x3D; 1.0
+        &#x2F;&#x2F; 镜面反射率
+        _SpecularRate(&quot;Specular&quot;,Range(0,1)) &#x3D; 0.5
+        &#x2F;&#x2F; 镜面贴图
+        _SpecularMap(&quot;SpecularMap&quot;,2D) &#x3D; &quot;white&quot; &#123;&#125;
+        &#x2F;&#x2F; 粗糙度
+        _Roughness(&quot;Roughness&quot;,Range(0,1)) &#x3D; 0.5
+        &#x2F;&#x2F; 粗糙度贴图
+        _RoughnessMap(&quot;RoughnessMap&quot;,2D) &#x3D;  &quot;white&quot; &#123;&#125;
+        &#x2F;&#x2F;各向异性强度。用于控制镜面反射高光的纵横比
+        _Anisotropic(&quot;Anisotropic&quot;,Range(0,1)) &#x3D; 0
+        &#x2F;&#x2F;一种额外的掠射分量，主要用于布料
+        _Sheen(&quot;Sheen&quot;,FLOAT) &#x3D; 0
+        &#x2F;&#x2F; 对光泽度的颜色控制
+        _SheenTint(&quot;SheenTint&quot;,COLOR) &#x3D; (1,1,1,1)
+        &#x2F;&#x2F; 清漆强度 有特殊用途的第二镜面波瓣
+        _ClearCoat(&quot;ClearCoat&quot;,FLOAT) &#x3D; 0
+        &#x2F;&#x2F; 清漆光泽度）：控制透明图层的光泽度，0&#x3D;缎面， 1&#x3D;光泽
+        _ClearCoatGloss(&quot;ClaerCoatGloss&quot;,Range(0,1)) &#x3D; 0.5
+        &#x2F;&#x2F; 次表面系数
+        _Subsurface(&quot;Subsurface&quot;,Range(0,1)) &#x3D; 0.5
+        _SubsurfaceMap(&quot;SubsurfaceMap&quot;,2D) &#x3D; &quot;white&quot; &#123;&#125;
+        _SubsurfaceMask(&quot;SubsurfaceMask&quot;,2D) &#x3D; &quot;white&quot; &#123;&#125;
+         &#x2F;&#x2F; 自发光
+        _EmissionMap(&quot;EmissionMap&quot;,2D) &#x3D; &quot;white&quot; &#123;&#125;
+        _EmissionColor(&quot;EmissionColor&quot;,COLOR) &#x3D; (1,1,1,1)
+    &#125;
+    SubShader
+    &#123;
+        Tags &#123; &quot;RenderType&quot;&#x3D;&quot;Opaque&quot; &quot;LightMode&quot;&#x3D;&quot;ForwardBase&quot;&#125;
+        LOD 100
+
+        Pass
+        &#123;
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            &#x2F;&#x2F; make fog work
+            #pragma multi_compile_fog
+
+            #include &quot;UnityCG.cginc&quot;
+            #include &quot;AutoLight.cginc&quot;
+            #include &quot;UnityLightingCommon.cginc&quot;
+            struct appdata
+            &#123;
+                float4 vertex : POSITION;
+                float2 uv : TEXCOORD0;
+                float4 tangent:TANGENT;
+                float3 normal:NORMAL;
+
+            &#125;;
+
+            struct v2f
+            &#123;
+                float2 uv : TEXCOORD0;
+                UNITY_FOG_COORDS(1)
+                float4 vertex : SV_POSITION;
+                float4 TtoW0:TEXCOORD1;
+                float4 TtoW1:TEXCOORD2;
+                float4 TtoW2:TEXCOORD3;
+                half3 binormal_W:TEXCOORD4;
+                half3 tangent_W:TEXCOORD5;
+            &#125;;
+
+            sampler2D _MainTex;
+            float4 _MainTex_ST;
+            fixed4 _BaseColor;
+            &#x2F;&#x2F; 金属度贴图 灰白图，越白表示金属度越高
+            sampler2D _MetallicTex;
+
+            &#x2F;&#x2F; 遮挡贴图 模拟物体之间的阴影，在不打光的时候增加体积感
+            sampler2D _OcclusionMap;
+            &#x2F;&#x2F; 法向贴图 法线贴图；用于增加模型的细节；
+            sampler2D _BumpMap;
+            float _BumpScale;
+            &#x2F;&#x2F; 镜面反射率
+            half _SpecularRate;
+            &#x2F;&#x2F; 镜面贴图
+            sampler2D _SpecularMap;
+            &#x2F;&#x2F; 粗糙度
+            half _Roughness;
+            &#x2F;&#x2F; 粗糙度贴图
+            sampler2D _RoughnessMap;
+            &#x2F;&#x2F;各向异性强度。用于控制镜面反射高光的纵横比
+            half _Anisotropic;
+            &#x2F;&#x2F;一种额外的掠射分量，主要用于布料
+            float _Sheen;
+            &#x2F;&#x2F; 对光泽度的颜色控制
+            fixed4 _SheenTint;
+            &#x2F;&#x2F; 清漆强度 有特殊用途的第二镜面波瓣
+            float _ClearCoat;
+            &#x2F;&#x2F; 清漆光泽度）：控制透明图层的光泽度，0&#x3D;缎面， 1&#x3D;光泽
+            half _ClearCoatGloss;
+            &#x2F;&#x2F; 次表面系数
+            float _Subsurface;
+            sampler2D _SubsurfaceMap;
+            sampler2D _SubsurfaceMask;
+            sampler2D _EmissionMap;
+            fixed4 _EmissionColor;
+            v2f vert (appdata v)
+            &#123;
+                v2f o;
+                o.vertex &#x3D; UnityObjectToClipPos(v.vertex);
+                float3 worldPos &#x3D; mul(unity_ObjectToWorld, v.vertex).xyz;
+
+                fixed3 worldNormal &#x3D; UnityObjectToWorldNormal(v.normal);
+                fixed3 worldTangent &#x3D; UnityObjectToWorldDir(v.tangent.xyz);
+                fixed3 worldBinormal &#x3D; cross(worldNormal, worldTangent)*v.tangent.w;
+                o.binormal_W &#x3D; worldBinormal;
+                o.tangent_W &#x3D; worldTangent;
+
+                o.TtoW0 &#x3D; float4(worldTangent.x, worldBinormal.x, worldNormal.x, worldPos.x);
+                o.TtoW1 &#x3D; float4(worldTangent.y, worldBinormal.y, worldNormal.y, worldPos.y);
+                o.TtoW2 &#x3D; float4(worldTangent.z, worldBinormal.z, worldNormal.z, worldPos.z);
+
+                o.uv &#x3D; TRANSFORM_TEX(v.uv, _MainTex);
+                UNITY_TRANSFER_FOG(o,o.vertex);
+                return o;
+            &#125;
+
+             &#x2F;&#x2F; 计算漫反射项
+            fixed3 DiffuseTerm(fixed3 BaseColor, float NdotH, float NdotV, float NdotL, float Roughness) &#123;
+                float fd90 &#x3D; 0.5 + 2 * Roughness * NdotH * NdotH;
+                float lightScalter &#x3D; 1 + (fd90-1)*pow(1-NdotL, 5);
+                float viewScalter &#x3D; 1 + (fd90 - 1)*pow(1-NdotV, 5);
+                return BaseColor * UNITY_INV_PI * lightScalter * viewScalter;
+            &#125;
+
+            &#x2F;&#x2F; NDF 法向分布函数
+            float DTermAnisotropic(half NdotH,half TdotH, half BdotH, half Roughness, half Anisotropic) &#123;
+                half a2 &#x3D; Roughness*Roughness;
+               &#x2F;&#x2F; a2 &#x3D; a2*a2;
+                half a &#x3D; sqrt(1-0.9*Anisotropic);
+                half x &#x3D; a2 &#x2F; a + 1e-5f;
+                half y &#x3D; a2 * a + 1e-5f;
+                half g_inv &#x3D; pow(TdotH*TdotH +  (BdotH*BdotH &#x2F; (y*y)) + NdotH*NdotH, 2);
+                return a2 * UNITY_INV_PI*(1&#x2F;y) &#x2F; g_inv;
+            &#125;
+
+            float DTerm(half NdotH, half Roughness, half power) &#123;
+                half a2 &#x3D; Roughness*Roughness;
+                half g_inv &#x3D; pow(NdotH*NdotH*(a2 -1) + 1, power);
+                return a2 * UNITY_INV_PI &#x2F; g_inv;
+            &#125;
+
+            inline half CustomGGXTerm(half NdotH, half roughness) &#123;
+                half a2 &#x3D; roughness * roughness;
+                half d &#x3D; (NdotH * a2 - NdotH) * NdotH + 1.0f;
+                return UNITY_INV_PI * a2 &#x2F; (d * d + 1e-7f);
+&#125;
+
+            &#x2F;&#x2F; G 阴影遮蔽函数
+            float GTerm(half Roughness, half NdotL, half NdotV) &#123;
+                float alpha &#x3D; pow((Roughness + 1)&#x2F;2,2);
+                float k &#x3D; alpha &#x2F; 2;
+                float gv &#x3D; NdotV &#x2F; (NdotV*(1-k) + k);
+                float gl &#x3D; NdotL &#x2F; (NdotL*(1-k) + k);
+                return saturate(gv*gl &#x2F; (4*NdotL*NdotV));
+            &#125;
+
+            float GTerm_Smith(half NdotL, half NdotV, half roughness) &#123;
+                half a2 &#x3D; roughness * roughness;
+                half lambdaV &#x3D; NdotL * (NdotV * (1 - a2) + a2);
+                half lambdaL &#x3D; NdotV * (NdotL * (1 - a2) + a2);
+                return 0.5f &#x2F; (lambdaV + lambdaL + 1e-5f);
+            &#125;
+
+            &#x2F;&#x2F; 菲涅尔项
+            half3 Fresnel(half3 c, half cosA) &#123;
+                half t &#x3D; pow(1-cosA, 5);
+                return c + (1-c)*t;
+            &#125;
+
+            fixed4 frag (v2f i) : SV_Target
+            &#123;
+
+                &#x2F;&#x2F; 计算一些需要用到的值
+                &#x2F;&#x2F; 世界坐标
+                float3 worldPos&#x3D;float3(i.TtoW0.w,i.TtoW1.w,i.TtoW2.w);
+                &#x2F;&#x2F; 切线空间下的法向量
+                half3 normalTangent &#x3D; UnpackNormal(tex2D(_BumpMap,i.uv));
+                normalTangent.xy*&#x3D;_BumpScale;
+                normalTangent.z &#x3D; sqrt(1.0 - saturate(dot(normalTangent.xy,normalTangent.xy)));
+                &#x2F;&#x2F; 世界坐标系的法向量
+                half3 normalWorld &#x3D;
+                  normalize(half3(dot(i.TtoW0.xyz, normalTangent),
+                                  dot(i.TtoW1.xyz, normalTangent), dot(i.TtoW2.xyz, normalTangent)));
+                &#x2F;&#x2F; 视角方向
+                half3 dirToCam &#x3D; normalize(UnityWorldSpaceViewDir(worldPos));
+                &#x2F;&#x2F; 光线方向
+                half3 dirToLight &#x3D; normalize(UnityWorldSpaceLightDir(worldPos));
+                &#x2F;&#x2F; 反射方向
+                half3 reflDir &#x3D; reflect(-dirToCam, normalWorld);
+                UNITY_LIGHT_ATTENUATION(atten, i, worldPos);
+                &#x2F;&#x2F; 半角方向
+                half3 halfDir &#x3D; normalize(dirToCam+dirToLight);
+                i.binormal_W &#x3D; normalize(i.binormal_W);
+                i.tangent_W &#x3D; normalize(i.tangent_W);
+                half nv &#x3D; saturate(dot(normalWorld, dirToCam));
+                half nl &#x3D; saturate(dot(normalWorld, dirToLight));
+                half nh &#x3D; saturate(dot(normalWorld, halfDir));
+                half lv &#x3D; saturate(dot(dirToLight, dirToCam));
+                half lh &#x3D; saturate(dot(dirToLight, halfDir));
+                half th &#x3D; saturate(dot(i.tangent_W, halfDir));
+                half bh &#x3D; saturate(dot(i.binormal_W, halfDir));
+                &#x2F;&#x2F; 计算光滑度和粗糙度
+
+                fixed4 roughnessMap &#x3D; tex2D(_RoughnessMap,i.uv);
+                float roughness &#x3D; max(roughnessMap.r, max(roughnessMap.b,roughnessMap.g))*_Roughness;
+                 float smoothness &#x3D; 1 - roughness;
+                &#x2F;&#x2F; 基础色
+                fixed4 baseColor &#x3D; tex2D(_MainTex, i.uv)*_BaseColor;
+
+                &#x2F;&#x2F; 自发光项
+                fixed3 emissionTerm&#x3D; tex2D(_EmissionMap,i.uv).rgb*_EmissionColor.rgb;
+
+                &#x2F;&#x2F; 漫反射项
+                fixed3 fd &#x3D; DiffuseTerm(baseColor,nh, nv, nl, roughness)*_Sheen*_SheenTint;
+                 &#x2F;&#x2F; 次表面
+                fixed3 surColor &#x3D; tex2D(_SubsurfaceMap, i.uv);
+                fixed3 fss &#x3D; DiffuseTerm(surColor ,nh, nv, nl, roughness);
+                fixed3 diffuseTerm &#x3D; fd*(1-_Subsurface)+fss*_Subsurface;
+
+                &#x2F;&#x2F; 镜面反射项
+                &#x2F;&#x2F; 法向分布
+                float D &#x3D; DTermAnisotropic(nh,th,bh, roughness, _Anisotropic);
+                D &#x3D; DTerm(nh, roughness, 2);
+                &#x2F;&#x2F; 菲涅尔
+                half4 metallicMap &#x3D; tex2D(_MetallicTex, i.uv);
+                metallicMap.rgb &#x3D; metallicMap.rgb*metallicMap.a*smoothness;
+                half metallicness &#x3D; max(metallicMap.r, max(metallicMap.g, metallicMap.b));
+
+                half4 specularMap &#x3D; tex2D(_SpecularMap, i.uv)*_SpecularRate;
+                half3 R0 &#x3D; specularMap.rgb*metallicness + baseColor *(1-metallicness);
+                half3 R00 &#x3D; specularMap.rgb*_ClearCoatGloss + baseColor *(1-_ClearCoatGloss);
+                half3 fresnelTerm &#x3D; Fresnel(R0, nl)*Fresnel(R00, nl);
+
+                &#x2F;&#x2F; 阴影遮蔽项
+                half G &#x3D; GTerm(roughness, nl, nv);
+                G &#x3D; GTerm_Smith(nl,nv,roughness);
+                half3 specularTerm &#x3D; G * D * fresnelTerm * _ClearCoat;
+                &#x2F;&#x2F; apply fog
+                UNITY_APPLY_FOG(i.fogCoord, col);
+
+                half3 col &#x3D; emissionTerm + UNITY_PI * (diffuseTerm + specularTerm ) *_LightColor0.rgb * nl * atten;
+                return fixed4(col,1);
+            &#125;
+            ENDCG
+        &#125;
+    &#125;
+&#125;
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h2><p>代码是错的，呜呜呜</p>
 
             </div>
 
@@ -295,8 +564,8 @@ $('.btn_click_load').click(function() {
 -->
 <script type="text/javascript">
     var disqus_config = function () {
-        this.page.url = 'http://vicat.wang/2022/01/01/PBR/';  // Replace PAGE_URL with your page's canonical URL variable
-        this.page.identifier = 'http://vicat.wang/2022/01/01/PBR/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.url = 'https://eatdreamcat.github.io/2022/01/01/PBR/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'https://eatdreamcat.github.io/2022/01/01/PBR/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
     };
 </script>
 
