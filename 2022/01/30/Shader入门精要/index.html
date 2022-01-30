@@ -105,8 +105,16 @@
 <meta property="og:image" content="http://static.zybuluo.com/candycat/h9oh7t35lbjrgogxywarmu55/CommandBuffer.png">
 <meta property="og:image" content="http://static.zybuluo.com/candycat/pef7ujj1xdzmzwdwz3n261rz/SmallCommand.png">
 <meta property="og:image" content="http://static.zybuluo.com/candycat/d6cxj75dc7hnzwd2jlcqlj4j/Batching.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/hojqrwubqu22k9jo0ues60hd/material_shader.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/fupmmv6n7raqei37v4jj6su1/mesh_renderer.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/936v924ooiux4x9v9l6nw7w2/material_inspector.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/dwq288k4s50acnc7sx2wz9fp/shader_import_settings.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/wvudje920on69gto9p9jq6bo/shader_compile_code.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/mfyfmiwipc220l4v8iowww6k/shaderlab_abstract.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/7u7q53pfa4pbtapi9wz9b6f7/shader_name.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/izzjwk3okp3r41uok617ry8t/shaderlab_properties.png">
 <meta property="article:published_time" content="2022-01-30T03:10:23.000Z">
-<meta property="article:modified_time" content="2022-01-30T12:25:02.112Z">
+<meta property="article:modified_time" content="2022-01-30T15:12:45.377Z">
 <meta property="article:author" content="Meta">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://static.zybuluo.com/candycat/c0opg7bab4cwzyok5vek52hs/%E6%A6%82%E5%BF%B5%E6%B5%81%E6%B0%B4%E7%BA%BF.png">
@@ -465,7 +473,215 @@
 <p>在一些比较老旧的 GPU 中，流水线仅提供配置操作。</p>
 </li>
 </ol>
-<h1 id="UnityShader-基础"><a href="#UnityShader-基础" class="headerlink" title="UnityShader 基础"></a>UnityShader 基础</h1><h1 id="数学基础"><a href="#数学基础" class="headerlink" title="数学基础"></a>数学基础</h1><h1 id="UnityShader-学习之旅"><a href="#UnityShader-学习之旅" class="headerlink" title="UnityShader 学习之旅"></a>UnityShader 学习之旅</h1><h1 id="基础光照"><a href="#基础光照" class="headerlink" title="基础光照"></a>基础光照</h1><h1 id="基础纹理"><a href="#基础纹理" class="headerlink" title="基础纹理"></a>基础纹理</h1><h1 id="透明效果"><a href="#透明效果" class="headerlink" title="透明效果"></a>透明效果</h1><h1 id="更复杂的光照"><a href="#更复杂的光照" class="headerlink" title="更复杂的光照"></a>更复杂的光照</h1><h1 id="高级纹理"><a href="#高级纹理" class="headerlink" title="高级纹理"></a>高级纹理</h1><h1 id="让画面动起来"><a href="#让画面动起来" class="headerlink" title="让画面动起来"></a>让画面动起来</h1><h1 id="屏幕后处理"><a href="#屏幕后处理" class="headerlink" title="屏幕后处理"></a>屏幕后处理</h1>
+<h1 id="UnityShader-基础"><a href="#UnityShader-基础" class="headerlink" title="UnityShader 基础"></a>UnityShader 基础</h1><h2 id="概述-1"><a href="#概述-1" class="headerlink" title="概述"></a>概述</h2><h3 id="材质"><a href="#材质" class="headerlink" title="材质"></a>材质</h3><p>在 unity 中，UnityShader 定义了渲染需要的代码，里面包含不同的属性和指令等，而材质允许我们去调节这些属性。<br><img src="http://static.zybuluo.com/candycat/hojqrwubqu22k9jo0ues60hd/material_shader.png"><br>Unity 中的材质需要结合 GameObject 或者 Particle Systems 组件来工作，它决定了我们的游戏对象看起来是什么样子。<br>在 Unity 的 GameObject 面板中可以看到 MeshRenderer 的材质列表<br><img src="http://static.zybuluo.com/candycat/fupmmv6n7raqei37v4jj6su1/mesh_renderer.png"><br>在材质的 Inspector 中，可以可视化的看到 Shader 中提供的可编辑的属性<br><img src="http://static.zybuluo.com/candycat/936v924ooiux4x9v9l6nw7w2/material_inspector.png"></p>
+<h3 id="UnityShader"><a href="#UnityShader" class="headerlink" title="UnityShader"></a>UnityShader</h3><p>UnityShader 本质是一个文本文件。单独的 UnityShader 无法发挥作用，必须和材质结合起来。<br>下图是 UnityShader 的导入设置面板<br><img src="http://static.zybuluo.com/candycat/dwq288k4s50acnc7sx2wz9fp/shader_import_settings.png"><br>Compile and Show code 下拉列表<br><img src="http://static.zybuluo.com/candycat/wvudje920on69gto9p9jq6bo/shader_compile_code.png"></p>
+<h2 id="Unity-的-ShaderLab"><a href="#Unity-的-ShaderLab" class="headerlink" title="Unity 的 ShaderLab"></a>Unity 的 ShaderLab</h2><p>UnityShader 是 Unity 为开发者提供的高层级的渲染抽象层。所有的 UnityShader 都是通过 ShaderLab 来编写的，ShaderLab 是 Unity 提供的编写 UnityShader 的一种说明性语言。<br><img src="http://static.zybuluo.com/candycat/mfyfmiwipc220l4v8iowww6k/shaderlab_abstract.png"></p>
+<p>一个 UnityShader 的基础结构如下：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Shader <span class="string">&quot;ShaderName&quot;</span> &#123;</span><br><span class="line">  Properties &#123;</span><br><span class="line">    <span class="regexp">//</span> 属性</span><br><span class="line">  &#125;</span><br><span class="line">  SubShader &#123;</span><br><span class="line">    <span class="regexp">//</span> 显卡A使用的子着色器</span><br><span class="line">  &#125;</span><br><span class="line">  SubShader &#123;</span><br><span class="line">    <span class="regexp">//</span> 显卡B使用的子着色器</span><br><span class="line">  &#125;</span><br><span class="line">  Fallback <span class="string">&quot;VertexLit&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="UnityShader-的结构"><a href="#UnityShader-的结构" class="headerlink" title="UnityShader 的结构"></a>UnityShader 的结构</h2><h3 id="命名"><a href="#命名" class="headerlink" title="命名"></a>命名</h3><p>Shader 的命名可以通过“&#x2F;”去控制在面板中出现的位置</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">Shader </span><span class="string">&quot;Custom/MyShader&quot;</span> &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://static.zybuluo.com/candycat/7u7q53pfa4pbtapi9wz9b6f7/shader_name.png"></p>
+<h3 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h3><p>Properties 语义块的定义通常如下：</p>
+<figure class="highlight mathematica"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Properties</span> <span class="punctuation">&#123;</span></span><br><span class="line">  <span class="variable">Name</span> <span class="punctuation">(</span><span class="string">&quot;display name&quot;</span><span class="operator">,</span> <span class="built_in">Property</span> <span class="variable">Type</span><span class="punctuation">)</span> <span class="operator">=</span> <span class="built_in">Default</span> <span class="built_in">Value</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>                          Proprtyies语义块支持的属性类型
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>属性类型</th>
+<th>默认值的定义语法</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Int</td>
+<td>number</td>
+<td>_Int(“Int”,Int) &#x3D; 2</td>
+</tr>
+<tr>
+<td>Float</td>
+<td>number</td>
+<td>_Float(“Float”, Float) &#x3D; 1.5</td>
+</tr>
+<tr>
+<td>Range(min, max)</td>
+<td>number</td>
+<td>_Float(“Range”, Range(0.0, 5.0)) &#x3D; 3.0</td>
+</tr>
+<tr>
+<td>Color</td>
+<td>(number,number,number,number)</td>
+<td>_Color(“Color”,Color) &#x3D; (1,1,1,1)</td>
+</tr>
+<tr>
+<td>Vector</td>
+<td>(number,number,number,number)</td>
+<td>_Vector(“Vector”,Vector) &#x3D; (2,3,6,1)</td>
+</tr>
+<tr>
+<td>2D</td>
+<td>“defaulttexture” {}</td>
+<td>_2D(“2D”,2D) &#x3D; “white” {}</td>
+</tr>
+<tr>
+<td>Cube</td>
+<td>“defaulttexture” {}</td>
+<td>_Cube(“Cube”,Cube) &#x3D; “white” {}</td>
+</tr>
+<tr>
+<td>3D</td>
+<td>“defaulttexture” {}</td>
+<td>_3D(“3D”,3D) &#x3D; “black” {}</td>
+</tr>
+</tbody></table>
+<p>以下代码给出一个展示所有属性的例子</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Shader <span class="string">&quot;Custom/ShaderLabProperties&quot;</span> &#123;</span><br><span class="line">  Properties &#123;</span><br><span class="line">    <span class="constructor">_Int(<span class="string">&quot;Int&quot;</span>,Int)</span> = <span class="number">2</span></span><br><span class="line">    <span class="constructor">_Float(<span class="string">&quot;Float&quot;</span>, Float)</span> = <span class="number">1.5</span></span><br><span class="line">    <span class="constructor">_Float(<span class="string">&quot;Range&quot;</span>, Range(0.0, 5.0)</span>) = <span class="number">3.0</span></span><br><span class="line">    <span class="constructor">_Color(<span class="string">&quot;Color&quot;</span>,Color)</span> = (<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>)</span><br><span class="line">    <span class="constructor">_Vector(<span class="string">&quot;Vector&quot;</span>,Vector)</span> = (<span class="number">2</span>,<span class="number">3</span>,<span class="number">6</span>,<span class="number">1</span>)</span><br><span class="line">    <span class="constructor">_2D(<span class="string">&quot;2D&quot;</span>,2D)</span> = <span class="string">&quot;white&quot;</span> &#123;&#125;</span><br><span class="line">    <span class="constructor">_Cube(<span class="string">&quot;Cube&quot;</span>,Cube)</span> = <span class="string">&quot;white&quot;</span> &#123;&#125;</span><br><span class="line">    <span class="constructor">_3D(<span class="string">&quot;3D&quot;</span>,3D)</span> = <span class="string">&quot;black&quot;</span> &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://static.zybuluo.com/candycat/izzjwk3okp3r41uok617ry8t/shaderlab_properties.png"></p>
+<h3 id="SubShader"><a href="#SubShader" class="headerlink" title="SubShader"></a>SubShader</h3><p>每一个 UnityShader 都需要包含至少一个 SubShader 语义块。当 Unity 需要加载 Shader 时，会扫描所有的 SubShader 语义块，然后选择第一个能够在目标平台上运行的 SubShader。如果都不支持的话，Unity 会使用 Fallback 语义指定的 Shader。</p>
+<p>SubShader 语义块中包含的定义通常如下</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">SubShader &#123;</span><br><span class="line">  <span class="regexp">//</span> 可选的</span><br><span class="line">  [Tags]</span><br><span class="line"></span><br><span class="line">  <span class="regexp">//</span> 可选的</span><br><span class="line">  [RenderSetup]</span><br><span class="line"></span><br><span class="line">  Pass &#123;</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="regexp">//</span> Other Passes</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>SubShader 中定义了一系列的 Pass 和可选的状态和标签设置。</p>
+<ul>
+<li><p>状态设置</p>
+<pre><code>                    常见的状态设置选项
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>状态名称</th>
+<th>设置指令</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Cull</td>
+<td>Cull Back | Front | Off</td>
+<td>设置剔除模式：剔除背面&#x2F;正面&#x2F;关闭剔除</td>
+</tr>
+<tr>
+<td>ZTest</td>
+<td>ZTest Less Greater | LEqual | GEqual | Equal | NotEqual | Always</td>
+<td>设置深度测试时使用的函数</td>
+</tr>
+<tr>
+<td>ZWrite</td>
+<td>ZWrite On | Off</td>
+<td>开启&#x2F;关闭深度写入</td>
+</tr>
+<tr>
+<td>Blend</td>
+<td>Blend SrcFactor DstFactor</td>
+<td>开启并设置混合模式</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<p>当在 SubShader 块中设置了上述渲染状态时，将会应用到所有的 Pass，也可以在个别的 Pass 中单独设置。</p>
+<ul>
+<li>标签设置<br>SubShader 中的标签设置是一个键值对。结构如下:</li>
+</ul>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="class">Tags </span>&#123; <span class="string">&quot;TagName1&quot;</span> = <span class="string">&quot;Value1&quot;</span> <span class="string">&quot;TagName2&quot;</span> = <span class="string">&quot;Value2&quot;</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<pre><code>                  SubShader的标签类型
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>标签类型</th>
+<th>说明</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Queue</td>
+<td>控制渲染的顺序，指定该物体属于哪一种渲染队列，通过这种方式可以保证所有透明物体在所有不透明物体后面被渲染，也可以自定义使用的渲染队列来控制物体的渲染顺序</td>
+<td>Tags { “Queue” &#x3D; “Transparent” }</td>
+</tr>
+<tr>
+<td>RenderType</td>
+<td>对着色器进行分类，可以被用于着色器替换功能</td>
+<td>Tags { “RerderType” &#x3D; “Opaque” }</td>
+</tr>
+<tr>
+<td>DisableBatching</td>
+<td>指定该标签来直接指明是否对该 SubShader 使用批处理</td>
+<td>Tage { “DisableBatching” &#x3D; “True” }</td>
+</tr>
+<tr>
+<td>ForceNoShadowCasting</td>
+<td>控制该 SubShader 的物体是否会投射阴影</td>
+<td>Tags { “ForceNoShaderCasting” &#x3D; &#x3D;”true” }</td>
+</tr>
+<tr>
+<td>IgnoreProjector</td>
+<td>如果该标签为“True”，那么使用该 SubShader 的物体将不受 Projector 的影响。通常用于半透明物体</td>
+<td>Tags { “IgnoreProjector” &#x3D; “True” }</td>
+</tr>
+<tr>
+<td>CanUseSpriteAtlas</td>
+<td>指定是否可以用于精灵打包图集</td>
+<td>Tags { “CanUseSpriteAtlas” &#x3D; “False” }</td>
+</tr>
+<tr>
+<td>PreviewType</td>
+<td>指明材质面板将如何预览该材质。默认情况下材质将显示为一个球形，可以设置为“Plane”“SkyBox”来改变预览类型</td>
+<td>Tags { “PreviewType” &#x3D; “Plane”}</td>
+</tr>
+</tbody></table>
+<p>Queue<br>指定渲染队列，用来控制对象什么时候渲染，有以下取值</p>
+<p>1.1 Background<br>值为 1000，此队列的对象最先进行渲染<br>1.2 Geometry<br>Queue 的默认值，值为 2000，通常用于不透明物体<br>1.3 AlphaTest<br>值为 2450，要么完全透明，要么不透明，多用于利用贴图来实现边缘透明的效果，也就是透贴。<br>1.4 Transparent<br>值为 3000，常用于半透明对象，渲染时从后往前进行渲染，建议需要混合的对象加入此队列。<br>1.5 OverLay<br>值为 4000，此渲染队列用于叠加效果，最后渲染的对象应该放在这里。</p>
+<h3 id="Pass"><a href="#Pass" class="headerlink" title="Pass"></a>Pass</h3><p>Pass 语义块定义如下：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Pass &#123;</span><br><span class="line"><span class="string">  [Name]</span></span><br><span class="line"><span class="string">  [Tags]</span></span><br><span class="line"><span class="string">  [RenderSetup]</span></span><br><span class="line">  <span class="comment">// other code</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过这个名称，我们可以用 ShaderLab 的 UsePass 命令，直接使用其他的 UnityShader 中的 Pass。<br>Pass 标签类型</p>
+<table>
+<thead>
+<tr>
+<th>标签类型</th>
+<th>说明</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LightMode</td>
+<td>定义该 Pass 在 Unity 的渲染流水线中的角色</td>
+<td>Tags { “LightMode” &#x3D; “ForwardBase” }</td>
+</tr>
+<tr>
+<td>RequireOptions</td>
+<td>用于指定当满足某些条件时才渲染该 Pass</td>
+<td>Tags { “RequireOptions” &#x3D; “SoftVegetation”}</td>
+</tr>
+</tbody></table>
+<p>LightMode Tag:</p>
+<ul>
+<li>Always : 始终渲染，没有任何光照</li>
+<li>ForwardBase: 在前向渲染中执行, 有环境光，主光源，顶点&#x2F;球谐光照</li>
+<li>ForwardAdd: 在前向渲染中执行，逐像素光照，一个光照一个 pass</li>
+<li>PrepassBase：在延迟渲染中执行，渲染法线和高光指数</li>
+<li>PrepassFinal: 在延迟渲染中执行,渲染最终的颜色（合并贴图，光照，自发光）</li>
+<li>Vertex: 在顶点光照中渲染（当物体没有光照贴图时,应用所有的顶点灯）</li>
+<li>VertexLMRGBM: 在顶点光照中渲染（当物体被光照贴图时,且贴图编码采用 RGBM）</li>
+<li>VertexLM：在顶点光照中渲染（当物体被光照贴图时,且贴图编码采用双 LDR）</li>
+<li>ShadowCaster: 将对象渲染为阴影投射器</li>
+<li>ShadowCollector: 将对象的阴影收集到屏幕空间缓冲区以用于前向渲染。</li>
+</ul>
+<p>RequireOptions:</p>
+<ul>
+<li>SoftVegetation: 仅当质量设置中启用软植被时才渲染此通道。</li>
+</ul>
+<p>除了上述的普通 Pass 外，Unity 还支持特殊的 Pass</p>
+<ul>
+<li>UsePass：复用其他 UnityShader 中的 Pass</li>
+<li>GrabPass：该 Pass 负责抓取屏幕并将结果存储在一张纹理中</li>
+</ul>
+<h3 id="Fallback"><a href="#Fallback" class="headerlink" title="Fallback"></a>Fallback</h3><p>作为一个备用选项，当上述 SubShader 都无法运行时，则会选择这个指定的 Shader。<br>Fallback 还会影响阴影的投射。在渲染阴影纹理时，Unity 会对每一个 UnityShader 中寻找一个投射阴影的 Pass。通常情况下不需要自己去实现这个 Shader，因为 Fallback 使用的内置 Shader 中就包含这样一个通用的 Pass。</p>
+<h1 id="数学基础"><a href="#数学基础" class="headerlink" title="数学基础"></a>数学基础</h1><h1 id="UnityShader-学习之旅"><a href="#UnityShader-学习之旅" class="headerlink" title="UnityShader 学习之旅"></a>UnityShader 学习之旅</h1><h1 id="基础光照"><a href="#基础光照" class="headerlink" title="基础光照"></a>基础光照</h1><h1 id="基础纹理"><a href="#基础纹理" class="headerlink" title="基础纹理"></a>基础纹理</h1><h1 id="透明效果"><a href="#透明效果" class="headerlink" title="透明效果"></a>透明效果</h1><h1 id="更复杂的光照"><a href="#更复杂的光照" class="headerlink" title="更复杂的光照"></a>更复杂的光照</h1><h1 id="高级纹理"><a href="#高级纹理" class="headerlink" title="高级纹理"></a>高级纹理</h1><h1 id="让画面动起来"><a href="#让画面动起来" class="headerlink" title="让画面动起来"></a>让画面动起来</h1><h1 id="屏幕后处理"><a href="#屏幕后处理" class="headerlink" title="屏幕后处理"></a>屏幕后处理</h1>
       
     </div>
     
@@ -599,7 +815,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%B2%E6%9F%93%E6%B5%81%E6%B0%B4%E7%BA%BF"><span class="nav-number">1.</span> <span class="nav-text">渲染流水线</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%B8%B2%E6%9F%93%E6%B5%81%E6%B0%B4%E7%BA%BF%EF%BC%9F"><span class="nav-number">1.1.</span> <span class="nav-text">什么是渲染流水线？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CPU-%E5%92%8C-GPU-%E4%B9%8B%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1"><span class="nav-number">1.2.</span> <span class="nav-text">CPU 和 GPU 之间的通信</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GPU-%E6%B5%81%E6%B0%B4%E7%BA%BF"><span class="nav-number">1.3.</span> <span class="nav-text">GPU 流水线</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.3.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%B6%E7%82%B9%E7%9D%80%E8%89%B2%E5%99%A8"><span class="nav-number">1.3.2.</span> <span class="nav-text">顶点着色器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A3%81%E5%89%AA"><span class="nav-number">1.3.3.</span> <span class="nav-text">裁剪</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%8F%E5%B9%95%E6%98%A0%E5%B0%84"><span class="nav-number">1.3.4.</span> <span class="nav-text">屏幕映射</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E8%A7%92%E5%BD%A2%E8%AE%BE%E7%BD%AE"><span class="nav-number">1.3.5.</span> <span class="nav-text">三角形设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E8%A7%92%E5%BD%A2%E9%81%8D%E5%8E%86"><span class="nav-number">1.3.6.</span> <span class="nav-text">三角形遍历</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%87%E5%85%83%E7%9D%80%E8%89%B2%E5%99%A8"><span class="nav-number">1.3.7.</span> <span class="nav-text">片元着色器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%90%E7%89%87%E5%85%83%E6%93%8D%E4%BD%9C"><span class="nav-number">1.3.8.</span> <span class="nav-text">逐片元操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Early-Z"><span class="nav-number">1.3.8.1.</span> <span class="nav-text">Early-Z</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%8C%E9%87%8D%E7%BC%93%E5%86%B2"><span class="nav-number">1.3.8.2.</span> <span class="nav-text">双重缓冲</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-number">1.3.9.</span> <span class="nav-text">问题</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#UnityShader-%E5%9F%BA%E7%A1%80"><span class="nav-number">2.</span> <span class="nav-text">UnityShader 基础</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80"><span class="nav-number">3.</span> <span class="nav-text">数学基础</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#UnityShader-%E5%AD%A6%E4%B9%A0%E4%B9%8B%E6%97%85"><span class="nav-number">4.</span> <span class="nav-text">UnityShader 学习之旅</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E5%85%89%E7%85%A7"><span class="nav-number">5.</span> <span class="nav-text">基础光照</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E7%BA%B9%E7%90%86"><span class="nav-number">6.</span> <span class="nav-text">基础纹理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%80%8F%E6%98%8E%E6%95%88%E6%9E%9C"><span class="nav-number">7.</span> <span class="nav-text">透明效果</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9B%B4%E5%A4%8D%E6%9D%82%E7%9A%84%E5%85%89%E7%85%A7"><span class="nav-number">8.</span> <span class="nav-text">更复杂的光照</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86"><span class="nav-number">9.</span> <span class="nav-text">高级纹理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%A9%E7%94%BB%E9%9D%A2%E5%8A%A8%E8%B5%B7%E6%9D%A5"><span class="nav-number">10.</span> <span class="nav-text">让画面动起来</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B1%8F%E5%B9%95%E5%90%8E%E5%A4%84%E7%90%86"><span class="nav-number">11.</span> <span class="nav-text">屏幕后处理</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%B2%E6%9F%93%E6%B5%81%E6%B0%B4%E7%BA%BF"><span class="nav-number">1.</span> <span class="nav-text">渲染流水线</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%B8%B2%E6%9F%93%E6%B5%81%E6%B0%B4%E7%BA%BF%EF%BC%9F"><span class="nav-number">1.1.</span> <span class="nav-text">什么是渲染流水线？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CPU-%E5%92%8C-GPU-%E4%B9%8B%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1"><span class="nav-number">1.2.</span> <span class="nav-text">CPU 和 GPU 之间的通信</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GPU-%E6%B5%81%E6%B0%B4%E7%BA%BF"><span class="nav-number">1.3.</span> <span class="nav-text">GPU 流水线</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.3.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%B6%E7%82%B9%E7%9D%80%E8%89%B2%E5%99%A8"><span class="nav-number">1.3.2.</span> <span class="nav-text">顶点着色器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A3%81%E5%89%AA"><span class="nav-number">1.3.3.</span> <span class="nav-text">裁剪</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%8F%E5%B9%95%E6%98%A0%E5%B0%84"><span class="nav-number">1.3.4.</span> <span class="nav-text">屏幕映射</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E8%A7%92%E5%BD%A2%E8%AE%BE%E7%BD%AE"><span class="nav-number">1.3.5.</span> <span class="nav-text">三角形设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E8%A7%92%E5%BD%A2%E9%81%8D%E5%8E%86"><span class="nav-number">1.3.6.</span> <span class="nav-text">三角形遍历</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%87%E5%85%83%E7%9D%80%E8%89%B2%E5%99%A8"><span class="nav-number">1.3.7.</span> <span class="nav-text">片元着色器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%90%E7%89%87%E5%85%83%E6%93%8D%E4%BD%9C"><span class="nav-number">1.3.8.</span> <span class="nav-text">逐片元操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Early-Z"><span class="nav-number">1.3.8.1.</span> <span class="nav-text">Early-Z</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%8C%E9%87%8D%E7%BC%93%E5%86%B2"><span class="nav-number">1.3.8.2.</span> <span class="nav-text">双重缓冲</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-number">1.3.9.</span> <span class="nav-text">问题</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#UnityShader-%E5%9F%BA%E7%A1%80"><span class="nav-number">2.</span> <span class="nav-text">UnityShader 基础</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0-1"><span class="nav-number">2.1.</span> <span class="nav-text">概述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%90%E8%B4%A8"><span class="nav-number">2.1.1.</span> <span class="nav-text">材质</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UnityShader"><span class="nav-number">2.1.2.</span> <span class="nav-text">UnityShader</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Unity-%E7%9A%84-ShaderLab"><span class="nav-number">2.2.</span> <span class="nav-text">Unity 的 ShaderLab</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UnityShader-%E7%9A%84%E7%BB%93%E6%9E%84"><span class="nav-number">2.3.</span> <span class="nav-text">UnityShader 的结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%BD%E5%90%8D"><span class="nav-number">2.3.1.</span> <span class="nav-text">命名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%9E%E6%80%A7"><span class="nav-number">2.3.2.</span> <span class="nav-text">属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SubShader"><span class="nav-number">2.3.3.</span> <span class="nav-text">SubShader</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pass"><span class="nav-number">2.3.4.</span> <span class="nav-text">Pass</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Fallback"><span class="nav-number">2.3.5.</span> <span class="nav-text">Fallback</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80"><span class="nav-number">3.</span> <span class="nav-text">数学基础</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#UnityShader-%E5%AD%A6%E4%B9%A0%E4%B9%8B%E6%97%85"><span class="nav-number">4.</span> <span class="nav-text">UnityShader 学习之旅</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E5%85%89%E7%85%A7"><span class="nav-number">5.</span> <span class="nav-text">基础光照</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E7%BA%B9%E7%90%86"><span class="nav-number">6.</span> <span class="nav-text">基础纹理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%80%8F%E6%98%8E%E6%95%88%E6%9E%9C"><span class="nav-number">7.</span> <span class="nav-text">透明效果</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9B%B4%E5%A4%8D%E6%9D%82%E7%9A%84%E5%85%89%E7%85%A7"><span class="nav-number">8.</span> <span class="nav-text">更复杂的光照</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86"><span class="nav-number">9.</span> <span class="nav-text">高级纹理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%A9%E7%94%BB%E9%9D%A2%E5%8A%A8%E8%B5%B7%E6%9D%A5"><span class="nav-number">10.</span> <span class="nav-text">让画面动起来</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B1%8F%E5%B9%95%E5%90%8E%E5%A4%84%E7%90%86"><span class="nav-number">11.</span> <span class="nav-text">屏幕后处理</span></a></li></ol></div>
             
 
           </div>
