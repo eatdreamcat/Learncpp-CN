@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="CG" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="渲染流水线什么是渲染流水线？渲染流水线可以简单的理解为计算机将三维物体转换到二维屏幕渲染的一个过程。渲染流程分为三个阶段：应用阶段、几何阶段、光栅化阶段。  应用阶段这个阶段主要由应用主导，通常由 CPU 负责实现。在这一阶段主要由三个任务：  数据准备：摄像机，场景中的模型，光源 剔除：将一些不需要渲染的部分剔除出去，提高渲染性能 设置渲染状态：材质，纹理，shader 等输出渲染图元给下一个阶">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Shader入门精要">
+<meta property="og:url" content="https://eatdreamcat.github.io/2022/01/30/Shader%E5%85%A5%E9%97%A8%E7%B2%BE%E8%A6%81/index.html">
+<meta property="og:site_name" content="Meta&#39;s Blog">
+<meta property="og:description" content="渲染流水线什么是渲染流水线？渲染流水线可以简单的理解为计算机将三维物体转换到二维屏幕渲染的一个过程。渲染流程分为三个阶段：应用阶段、几何阶段、光栅化阶段。  应用阶段这个阶段主要由应用主导，通常由 CPU 负责实现。在这一阶段主要由三个任务：  数据准备：摄像机，场景中的模型，光源 剔除：将一些不需要渲染的部分剔除出去，提高渲染性能 设置渲染状态：材质，纹理，shader 等输出渲染图元给下一个阶">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/c0opg7bab4cwzyok5vek52hs/%E6%A6%82%E5%BF%B5%E6%B5%81%E6%B0%B4%E7%BA%BF.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/qwr4r6aglmod38w2k1e0dq7h/CopyDataToGPU.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/gld5mfj5o10kardzyn10p5a6/SetRenderState.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/5nuo5d8oh1c8sxexr3d7e935/DrawCall.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/jundxsf604yuoy2zr3r1qkzp/GPU%E6%B5%81%E6%B0%B4%E7%BA%BF.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/07rjqb1pkfipxiizr1nsywuf/VertexShaderProcess.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/2zpu3oh7n6kpy4rosqtjugcy/Vertex%20Shader.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/08cvo0uahel9ygds4xkwrczp/Clipping.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/7xtfj07anrw60g4y7cadkd8h/ScreenMapping.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/ul58wnwn76vj0gm20m3xsi9g/Screen%20Mapping_OpenGL_DirectX.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/1ltkl388mkbbzbfgzm28f6gy/TriangleSetupAndTraversal.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/lowfuoi0r43oxfgxkp9darur/FragmentShader.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/epejev04t6vudwsyo2el8rp0/Per-fragment%20Operations.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/28t2ora2kenj1uudwfgfig95/Stencil%20Test_Depth%20Test.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/k7q79qcgoqkw8myu1lpuy7he/Blending.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/4x54y4f2kjlhil8wq7oi1fpa/OpenGL%E5%92%8CDirectX.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/h9oh7t35lbjrgogxywarmu55/CommandBuffer.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/pef7ujj1xdzmzwdwz3n261rz/SmallCommand.png">
+<meta property="og:image" content="http://static.zybuluo.com/candycat/d6cxj75dc7hnzwd2jlcqlj4j/Batching.png">
+<meta property="article:published_time" content="2022-01-30T03:10:23.000Z">
+<meta property="article:modified_time" content="2022-01-30T12:25:02.112Z">
+<meta property="article:author" content="Meta">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://static.zybuluo.com/candycat/c0opg7bab4cwzyok5vek52hs/%E6%A6%82%E5%BF%B5%E6%B5%81%E6%B0%B4%E7%BA%BF.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://eatdreamcat.github.io/2022/01/30/Shader入门精要/"/>
+
+
+
+
+
+  <title>Shader入门精要 | Meta's Blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Meta's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/home/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="Searching..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://eatdreamcat.github.io/2022/01/30/Shader%E5%85%A5%E9%97%A8%E7%B2%BE%E8%A6%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://wx4.sinaimg.cn/mw2000/006TbTv5ly1gyvxf8lr73j30qo0qo40f.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Meta's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Shader入门精要</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2022-01-30T11:10:23+08:00">
+                2022-01-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="渲染流水线"><a href="#渲染流水线" class="headerlink" title="渲染流水线"></a>渲染流水线</h1><h2 id="什么是渲染流水线？"><a href="#什么是渲染流水线？" class="headerlink" title="什么是渲染流水线？"></a>什么是渲染流水线？</h2><p>渲染流水线可以简单的理解为计算机将三维物体转换到二维屏幕渲染的一个过程。<br>渲染流程分为三个阶段：<strong>应用阶段</strong>、<strong>几何阶段</strong>、<strong>光栅化阶段</strong>。</p>
+<ul>
+<li><p>应用阶段<br>这个阶段主要由应用主导，通常由 CPU 负责实现。<br>在这一阶段主要由三个任务：</p>
+<ol>
+<li>数据准备：摄像机，场景中的模型，光源</li>
+<li>剔除：将一些不需要渲染的部分剔除出去，提高渲染性能</li>
+<li>设置渲染状态：材质，纹理，shader 等<br>输出渲染图元给下一个阶段—–几何阶段</li>
+</ol>
+</li>
+<li><p>几何阶段<br>这一阶段通常在 GPU 中进行，逐顶点、逐多边形的操作。<br>几何阶段最主要的任务就是把顶点坐标变换到屏幕空间中，<br>再交给光栅器进行处理。<br>这一阶段会输出屏幕空间的二维顶点坐标，以及对应的深度值、着色等相关信息。</p>
+</li>
+<li><p>光栅化阶段<br>这一阶段也是在 GPU 中进行的。<br>通过几何阶段产生的数据，决定每个渲染图元中的哪些像素应该被绘制在屏幕上。<br>通过计算每个图元覆盖哪些像素，并为这些像素进行插值计算去算出它们的着色。<br><img src="http://static.zybuluo.com/candycat/c0opg7bab4cwzyok5vek52hs/%E6%A6%82%E5%BF%B5%E6%B5%81%E6%B0%B4%E7%BA%BF.png"></p>
+</li>
+</ul>
+<h2 id="CPU-和-GPU-之间的通信"><a href="#CPU-和-GPU-之间的通信" class="headerlink" title="CPU 和 GPU 之间的通信"></a>CPU 和 GPU 之间的通信</h2><p>渲染流水线的起点是 CPU，即应用阶段。应用阶段大致可分为下面三个阶段：<br>（1）把数据加载到显存中<br><img src="http://static.zybuluo.com/candycat/qwr4r6aglmod38w2k1e0dq7h/CopyDataToGPU.png"><br>（2）设置渲染状态<br><img src="http://static.zybuluo.com/candycat/gld5mfj5o10kardzyn10p5a6/SetRenderState.png"><br>（3）调用 DrawCall<br><img src="http://static.zybuluo.com/candycat/5nuo5d8oh1c8sxexr3d7e935/DrawCall.png"></p>
+<h2 id="GPU-流水线"><a href="#GPU-流水线" class="headerlink" title="GPU 流水线"></a>GPU 流水线</h2><h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>GPU 流水线即 GPU 的渲染过程，如下图<br><img src="http://static.zybuluo.com/candycat/jundxsf604yuoy2zr3r1qkzp/GPU%E6%B5%81%E6%B0%B4%E7%BA%BF.png"><br>绿色表示该流水线是完全可编程控制的<br>黄色表示该流水线可以配置，但是不可编程<br>蓝色表示该流水线由 GPU 固定实现<br>实线表示该 shader 必须由开发者编程实现，虚线表示该 shader 是可选的。</p>
+<p>几何阶段：</p>
+<ul>
+<li><p>顶点着色器<br>完全可编程，通常用于实现顶点的空间变换、顶点颜色等功能。另外，有一些能在顶点计算的，<br>则尽量在顶点中计算好，因为在片元着色器计算的话，相当于每一个片元都得执行一次运算。</p>
+</li>
+<li><p>曲面细分着色器<br>是一个可选的着色器，用于细分图元</p>
+</li>
+<li><p>几何着色器<br>可选着色器，可以被用于逐图元的着色操作，或者用于产生更多的图元。</p>
+</li>
+<li><p>裁剪<br>这个阶段的目的是将那些不在摄像机视野内的顶点裁剪掉，并提出某些三角图元面片。这个阶段是可配置的。</p>
+</li>
+<li><p>屏幕映射：<br>不可编程和不可配置，负责把每个图元的坐标转换到屏幕坐标中。</p>
+</li>
+</ul>
+<p>光栅化阶段：</p>
+<ul>
+<li>三角形设置<br>GPU 固定实现</li>
+<li>三角形遍历<br>GPU 固定实现</li>
+<li>片元着色器<br>完全可编程，这一步中的片元，是已经经过 GPU 对三角形计算覆盖像素，并且对其中的属性进行过插值计算的</li>
+<li>逐片元操作<br>高可配置的。负责执行很多重要操作，例如修改颜色、深度缓冲、混合等。</li>
+</ul>
+<h3 id="顶点着色器"><a href="#顶点着色器" class="headerlink" title="顶点着色器"></a>顶点着色器</h3><p>顶点着色器是流水线第一阶段，它的输入来自 CPU。处理的数据是顶点数据，也就是每一个顶点，都会执行一次顶点着色器，顶点着色器本身不能创建或者销毁顶点，也不能获取顶点之间的关系。<br>顶点着色器一般会用来计算坐标转换、逐顶点光照等，也可以计算一些后续阶段需要用到的数据。<br><img src="http://static.zybuluo.com/candycat/07rjqb1pkfipxiizr1nsywuf/VertexShaderProcess.png"></p>
+<ul>
+<li>坐标变换<br>把顶点坐标从模型空间转换到齐次裁剪空间<br>类似代码</li>
+</ul>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">o.pos</span> = mul(UNITY_MVP, v.position)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+
+<p>在顶点转到齐次裁剪空间后，由硬件做透视除法最终得到归一化的设备坐标（NDC）。<br><img src="http://static.zybuluo.com/candycat/2zpu3oh7n6kpy4rosqtjugcy/Vertex%20Shader.png"></p>
+<h3 id="裁剪"><a href="#裁剪" class="headerlink" title="裁剪"></a>裁剪</h3><p>只渲染摄像机能看到的部分，去掉视野范围外的物体。<br>如下图<br><img src="http://static.zybuluo.com/candycat/08cvo0uahel9ygds4xkwrczp/Clipping.png"></p>
+<h3 id="屏幕映射"><a href="#屏幕映射" class="headerlink" title="屏幕映射"></a>屏幕映射</h3><p>屏幕映射的任务是把图元的 x 和 y 坐标转换到屏幕坐标系。屏幕坐标系是一个二维的坐标系。屏幕映射不会对 z 做处理，z 坐标系会和屏幕坐标系一起构成一个坐标系叫窗口坐标系，一起被传递到光栅化阶段。<br><img src="http://static.zybuluo.com/candycat/7xtfj07anrw60g4y7cadkd8h/ScreenMapping.png"></p>
+<p>值得注意的是，在 OpenGL 和 DirectX 之间，屏幕坐标系是不一样，如下图<br><img src="http://static.zybuluo.com/candycat/ul58wnwn76vj0gm20m3xsi9g/Screen%20Mapping_OpenGL_DirectX.png"></p>
+<h3 id="三角形设置"><a href="#三角形设置" class="headerlink" title="三角形设置"></a>三角形设置</h3><p>由这一步开始，就进入光栅化阶段，光栅化的第一步就是三角形设置。光栅化需要计算三角形图元对像素的覆盖情况，而三角形设置就是根据上一阶段传过来的顶点信息，去计算三角形边界的像素信息输出给下一个阶段。</p>
+<h3 id="三角形遍历"><a href="#三角形遍历" class="headerlink" title="三角形遍历"></a>三角形遍历</h3><p>三角形遍历阶段会检查每一个像素是否被一个三角形网格所覆盖。如果被覆盖，就会生成一个片元，三角形遍历阶段，会根据上一个阶段的计算结果，来判断一个三角形网格覆盖了哪些像素，并使用三个顶点的顶点信息对整个覆盖区域的像素进行插值。<br><img src="http://static.zybuluo.com/candycat/1ltkl388mkbbzbfgzm28f6gy/TriangleSetupAndTraversal.png"></p>
+<h3 id="片元着色器"><a href="#片元着色器" class="headerlink" title="片元着色器"></a>片元着色器</h3><p>片元着色器是另一个非常重要的可编程着色器阶段。<br>前面的光栅化阶段，实际上不会影响到屏幕上的每一个像素的颜色值，而是会产生一系列的数据信息，用来表示三角形网格是怎样覆盖每个像素的，每个片元就负责存储这样一系列数据。<br>真正对像素产生影响的是阶段的下一步操作————逐片元操作。</p>
+<p>片元着色器的输出，是上一阶段对顶点信息插值得到的结果。<br><img src="http://static.zybuluo.com/candycat/lowfuoi0r43oxfgxkp9darur/FragmentShader.png"></p>
+<p>片元仅可以操作单个片元，不能去作用于自己的邻居。每个片元的计算和顶点类似，都是相互独立的，但是片元可以访问导数信息。</p>
+<p>因为 GPU 在光栅化的时候，一般是以 2x2 像素为基本单位，这里 GPU 会去计算相邻像素的变化率，即 ddx 和 ddy。</p>
+<h3 id="逐片元操作"><a href="#逐片元操作" class="headerlink" title="逐片元操作"></a>逐片元操作</h3><p>在 DirectX 中，这一步也被叫做输出合并阶段。<br>这一步有几个主要任务。<br>（1）决定每个片元的可见性，例如深度测试、模板测试。<br>（2）如果一个片元通过了所有测试，就需要将片元的颜色值和已经存储在颜色缓冲区的颜色进行混合。<br>逐片元操作是高度可配置的，我们可以去设置每一个操作的细节。<br><img src="http://static.zybuluo.com/candycat/epejev04t6vudwsyo2el8rp0/Per-fragment%20Operations.png"></p>
+<p>一个片元，只有通过了所有的测试之后，才能和颜色缓冲区的颜色进行混合，最后再写入颜色缓冲区。<br><img src="http://static.zybuluo.com/candycat/28t2ora2kenj1uudwfgfig95/Stencil%20Test_Depth%20Test.png"></p>
+<p>在模板测试中，一个片元不管有没有通过测试，都可以根据配置去选择要不要写入模板缓冲区的值。<br>而在深度测试中，只有通过深度测试的片元，才有权利选择要不要写入深度缓冲。并且深度测试通过的标准，也是可配置的，例如可以设定大于算通过也可以设定小于或者等于才算通过。</p>
+<p>如果一个片元通过了以上所有测试，那么就可以来到合并操作了，当然，对于不透明的物体渲染，显然是可以直接关闭合并的。</p>
+<p><img src="http://static.zybuluo.com/candycat/k7q79qcgoqkw8myu1lpuy7he/Blending.png"></p>
+<p>合并的规则也是可配置的</p>
+<h4 id="Early-Z"><a href="#Early-Z" class="headerlink" title="Early-Z"></a>Early-Z</h4><p>虽然逻辑上，以上的测试都是在片元着色器后面进行的，但是大多数 GPU 都会尽可能在执行片元着色器之前就进行测试。因为在某些情况下，有可能一些片元着色器计算完之后根本不需要被渲染，提前测试的话，就可以省去一些无用的计算，从而提高性能。例如提前进行深度测试，这种提前的深度测试，也被叫做 Early-Z。</p>
+<p>但是，如果将测试提前做，其检验结果可能会与片元着色器中的一些操作冲突。例如，如果我们在片元着色器上进行透明度测试，调用 clip 函数来手动舍弃片元，就会导致 GPU 无法提前执行各种测试。<br><font size=2>（这里所谓的冲突，可以体现在片元通过提前测试并且写入了缓冲，但是在片元着色器却被 discard 掉了，导致缓冲区的结果已经不可靠了，因此就没办法再相信这个缓冲区去做提前测试了）</font></p>
+<p>因此，现代的 GPU 会判断片元着色器中的操作是否和提前测试发生冲突，如果有冲突，就会禁止提前测试。</p>
+<h4 id="双重缓冲"><a href="#双重缓冲" class="headerlink" title="双重缓冲"></a>双重缓冲</h4><p>当模型的图元通过层层计算和测试之后，就会显示到屏幕上。GPU 采用双重缓冲策略，对于场景的渲染，是离屏渲染的，即在后置缓冲区，但渲染完毕之后，GPU 则会交换前置缓冲区和后置缓冲区来显示新的内容。</p>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><ol>
+<li><p>什么是 OpenGL&#x2F;DirectX？<br>这两者本质上都可以理解为 GPU 的 API<br><img src="http://static.zybuluo.com/candycat/4x54y4f2kjlhil8wq7oi1fpa/OpenGL%E5%92%8CDirectX.png"></p>
+</li>
+<li><p>什么是 HLSL、GLSL、Cg？<br>在可编程的着色器阶段，需要用特定的着色器语言去编写逻辑。常见的着色器语言有 DirectX 的 HLSL，OpenGL 的 GLSL，以及 NVIDIA 的 Cg。</p>
+</li>
+<li><p>什么是 DrawCall？</p>
+<pre><code>DrawCall 本身的含义就是 CPU 调用图像编程接口去命令 GPU 进行渲染的操作。
+而 DrawCall 容易引发性能瓶颈的元凶则是 CPU。
+
+    3.1 CPU 和 GPU 是如何实现并行工作的？
+
+    CPU和GPU是通过命令缓冲来实现并行工作的，其中DrawCall就是其中一种命令，
+    其他的命令还有改变渲染状态，切换纹理等。
+</code></pre>
+<p><img src="http://static.zybuluo.com/candycat/h9oh7t35lbjrgogxywarmu55/CommandBuffer.png"></p>
+<pre><code>    3.2 为什么 DrawCall 多了会影响效率？
+
+    CPU在提交DrawCall需要一系列的准备工作，而GPU的渲染能力很强。
+    如果DrawCall的数量过多，CPU就会花费大量时间用来准备，造成CPU过载。
+</code></pre>
+<p><img src="http://static.zybuluo.com/candycat/pef7ujj1xdzmzwdwz3n261rz/SmallCommand.png"></p>
+<pre><code>    3.3 如何减少 DrawCall？
+    方法有很多，但最常见的则是批处理的方法。
+</code></pre>
+<p><img src="http://static.zybuluo.com/candycat/d6cxj75dc7hnzwd2jlcqlj4j/Batching.png"></p>
+</li>
+<li><p>什么是固定管线渲染？</p>
+<p>在一些比较老旧的 GPU 中，流水线仅提供配置操作。</p>
+</li>
+</ol>
+<h1 id="UnityShader-基础"><a href="#UnityShader-基础" class="headerlink" title="UnityShader 基础"></a>UnityShader 基础</h1><h1 id="数学基础"><a href="#数学基础" class="headerlink" title="数学基础"></a>数学基础</h1><h1 id="UnityShader-学习之旅"><a href="#UnityShader-学习之旅" class="headerlink" title="UnityShader 学习之旅"></a>UnityShader 学习之旅</h1><h1 id="基础光照"><a href="#基础光照" class="headerlink" title="基础光照"></a>基础光照</h1><h1 id="基础纹理"><a href="#基础纹理" class="headerlink" title="基础纹理"></a>基础纹理</h1><h1 id="透明效果"><a href="#透明效果" class="headerlink" title="透明效果"></a>透明效果</h1><h1 id="更复杂的光照"><a href="#更复杂的光照" class="headerlink" title="更复杂的光照"></a>更复杂的光照</h1><h1 id="高级纹理"><a href="#高级纹理" class="headerlink" title="高级纹理"></a>高级纹理</h1><h1 id="让画面动起来"><a href="#让画面动起来" class="headerlink" title="让画面动起来"></a>让画面动起来</h1><h1 id="屏幕后处理"><a href="#屏幕后处理" class="headerlink" title="屏幕后处理"></a>屏幕后处理</h1>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://wx4.sinaimg.cn/mw2000/006TbTv5ly1gyvxf8lr73j30qo0qo40f.jpg"
+                alt="" />
+            
+              <p class="site-author-name" itemprop="name"></p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%B2%E6%9F%93%E6%B5%81%E6%B0%B4%E7%BA%BF"><span class="nav-number">1.</span> <span class="nav-text">渲染流水线</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%B8%B2%E6%9F%93%E6%B5%81%E6%B0%B4%E7%BA%BF%EF%BC%9F"><span class="nav-number">1.1.</span> <span class="nav-text">什么是渲染流水线？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CPU-%E5%92%8C-GPU-%E4%B9%8B%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1"><span class="nav-number">1.2.</span> <span class="nav-text">CPU 和 GPU 之间的通信</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GPU-%E6%B5%81%E6%B0%B4%E7%BA%BF"><span class="nav-number">1.3.</span> <span class="nav-text">GPU 流水线</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.3.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%B6%E7%82%B9%E7%9D%80%E8%89%B2%E5%99%A8"><span class="nav-number">1.3.2.</span> <span class="nav-text">顶点着色器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A3%81%E5%89%AA"><span class="nav-number">1.3.3.</span> <span class="nav-text">裁剪</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%8F%E5%B9%95%E6%98%A0%E5%B0%84"><span class="nav-number">1.3.4.</span> <span class="nav-text">屏幕映射</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E8%A7%92%E5%BD%A2%E8%AE%BE%E7%BD%AE"><span class="nav-number">1.3.5.</span> <span class="nav-text">三角形设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E8%A7%92%E5%BD%A2%E9%81%8D%E5%8E%86"><span class="nav-number">1.3.6.</span> <span class="nav-text">三角形遍历</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%87%E5%85%83%E7%9D%80%E8%89%B2%E5%99%A8"><span class="nav-number">1.3.7.</span> <span class="nav-text">片元着色器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%90%E7%89%87%E5%85%83%E6%93%8D%E4%BD%9C"><span class="nav-number">1.3.8.</span> <span class="nav-text">逐片元操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Early-Z"><span class="nav-number">1.3.8.1.</span> <span class="nav-text">Early-Z</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%8C%E9%87%8D%E7%BC%93%E5%86%B2"><span class="nav-number">1.3.8.2.</span> <span class="nav-text">双重缓冲</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-number">1.3.9.</span> <span class="nav-text">问题</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#UnityShader-%E5%9F%BA%E7%A1%80"><span class="nav-number">2.</span> <span class="nav-text">UnityShader 基础</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80"><span class="nav-number">3.</span> <span class="nav-text">数学基础</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#UnityShader-%E5%AD%A6%E4%B9%A0%E4%B9%8B%E6%97%85"><span class="nav-number">4.</span> <span class="nav-text">UnityShader 学习之旅</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E5%85%89%E7%85%A7"><span class="nav-number">5.</span> <span class="nav-text">基础光照</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E7%BA%B9%E7%90%86"><span class="nav-number">6.</span> <span class="nav-text">基础纹理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%80%8F%E6%98%8E%E6%95%88%E6%9E%9C"><span class="nav-number">7.</span> <span class="nav-text">透明效果</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9B%B4%E5%A4%8D%E6%9D%82%E7%9A%84%E5%85%89%E7%85%A7"><span class="nav-number">8.</span> <span class="nav-text">更复杂的光照</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%AB%98%E7%BA%A7%E7%BA%B9%E7%90%86"><span class="nav-number">9.</span> <span class="nav-text">高级纹理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%A9%E7%94%BB%E9%9D%A2%E5%8A%A8%E8%B5%B7%E6%9D%A5"><span class="nav-number">10.</span> <span class="nav-text">让画面动起来</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B1%8F%E5%B9%95%E5%90%8E%E5%A4%84%E7%90%86"><span class="nav-number">11.</span> <span class="nav-text">屏幕后处理</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Meta</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three-waves.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
