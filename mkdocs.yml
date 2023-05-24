@@ -1,2 +1,34 @@
-site_name: My Docs
+site_name: Learncpp中文网
 theme: readthedocs
+
+site_url: https://example.com/
+nav:
+    - Home: index.md
+    - 开始: start.md
+    - C++基础: start.md
+    - 方法和文件: method.md
+    - Debugging: debugging.md
+    - 基础类型: datatype.md
+    - 运算符: operate.md
+    - 位操作（可选章节）: bit.md
+    - 作用域、生命周期、连接: scope.md
+    - 控制流和错误处理: flowcontrol.md
+    - 类型转换和函数重载: overload.md
+    - 复合类型：引用和指针: pointer.md
+    - 复合类型：枚举和结构体: enums.md
+    - 数组、字符串和动态分配: arrays.md
+    - 函数类型: funcrions.md
+    - 基础面向对象编程: oop.md
+    - 运算符重载: operator_overloading.md
+    - 对象关系介绍: intro_obj_relation.md
+    - 继承: inheritance.md
+    - 虚函数: virtual_func.md
+    - 模板和类: template.md
+    - 异常处理: except.md
+    - 移位语义和智能指针: move_semantics_smart_pointer.md
+    - 标准模板库STL: stl.md
+    - 字符串类String: string.md
+    - 输入和输出（IO）: io.md
+    - 额外话题: miscellaneous_subjects.md
+    - C++的更新: c++_updates.md
+    - 结束语: end.md
