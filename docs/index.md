@@ -17,20 +17,36 @@
 
 最后的最后，欢迎关注我的个人知乎首页哦，会不定期发表没有技术含量的水文。
 
-https://www.zhihu.com/people/chi-meng-de-mao
+<https://www.zhihu.com/people/chi-meng-de-mao>
 
-本人照片如下：
-![image](../img/GAMES101.jpg)
+本人照片如下：   
+![image](./img/GAMES101.jpg)
 
 
 ## 欢迎来到C++的世界
 
 接受C++的审判吧！
 
+对了，额外说明一下，本教程基本上都是按照<https://www.learncpp.com/>来的。   
+但是有些部分可能会有点不一样，例如IDE上，我打算使用Cmake+VSCode的组合。         
+
+原教程应该是更加面向初学者，会更加详细，我这里就不那么细致啦            
 
 ## 为什么要学习C++？
+
+至少在图形学这个方向上，C++是无法逃避的！！！！！！！！         
+另外，C++也是一门历史悠久的语言，学会C++的话，相信对于别的语言也会有更进一步的了解。        
+对于喜欢直面恐惧的人，学习C++当然是最好的选择啦！
+
+![image](./img/e1f3-hwsffzc1157224.jpg)
 
 
 ## 你将学会什么？
 
+你将学会C++     
+![image](./img/images.jfif)
+
 ## 关于中文翻译
+
+英文原版的地址为：<https://www.learncpp.com/>
+

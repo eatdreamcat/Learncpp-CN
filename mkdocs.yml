@@ -5,7 +5,7 @@ site_url: https://example.com/
 nav:
     - Home: index.md
     - 开始: start.md
-    - C++基础: start.md
+    - C++基础: basic_cpp.md
     - 方法和文件: method.md
     - Debugging: debugging.md
     - 基础类型: datatype.md
